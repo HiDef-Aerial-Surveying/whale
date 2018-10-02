@@ -12,12 +12,16 @@ from m_util import *
 import time
 import numpy as np
 import rasterio
+
+
 class Pipe:
     def __init__(self,input,output):
         self.import_model()
         self.output = output
         sdmkdir(self.output)
         self.input =  input
+
+
     def import_model(self):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         model_ft = torchvision.models.resnet18(pretrained=True)
@@ -72,6 +76,8 @@ class Pipe:
                         dst.write(outpng.astype(rasterio.uint8), 1)
         except:
             print("failed")
+
+            
     def png_predict(self,im):
         last = time.time()
         parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -139,3 +145,14 @@ a.list_tif_predict('full.txt')
 
 #a.tif_predict('/gpfs/projects/LynchGroup/Orthoed/WV02_20160119013349_1030010050B0C500_16JAN19013349-M1BS-500637522050_01_P001_u08rf3031.tif')
 #a.dir_tif_predict('/gpfs/projects/LynchGroup/Penguin_workstation/Train_all/raw/train/')
+
+
+
+
+
+
+
+if pred[0,0] > pred[0,1]:
+        print("Whale")
+    else:
+        print("not whale")

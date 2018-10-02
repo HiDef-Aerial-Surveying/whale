@@ -6,6 +6,10 @@ import os.path
 import argparse
 from scipy import misc
 from m_util import *
+
+
+s = spacewhale()
+
 parse = argparse.ArgumentParser()
 parse.add_argument('--root',type=str,default='./Water_Training')
 parse.add_argument('--step',type=int,default=500)
@@ -15,14 +19,14 @@ opt = parse.parse_args()
 opt.im_fold = opt.root
 opt.results = opt.output
 
-sdmkdir(opt.results)
+s.sdmkdir(opt.results)
 opt.input_nc =3
 imlist=[]
 imnamelist=[]
 
 for root,_,fnames in sorted(os.walk(opt.root)):
     for fname in fnames:
-        if fname.endswith('.PNG'):
+        if fname.lower().endswith('.png'):
             path = os.path.join(root,fname)
             imlist.append((path,fname))
             imnamelist.append(fname)
@@ -30,4 +34,5 @@ for root,_,fnames in sorted(os.walk(opt.root)):
 for im_path,imname in  imlist:
     png = misc.imread(im_path,mode='RGB')
     w,h,z = png.shape
-    savepatch_train(png,w,h,opt.step,opt.size,opt.results+'/'+imname[:-4]+'#')
+
+    s.savepatch_train(png,w,h,opt.step,opt.size,opt.results+'/'+imname[:-4]+'#')
