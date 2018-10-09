@@ -1,89 +1,51 @@
+#######################################################################################################
+### Code for splitting training and testing data for cross-validation
+### Authors: Hieu Le and Grant Humphries
+### Date:    Oct, 2018
+#######################################################################################################
+###  Setup information
+###     To run this in command line, the root_dir option is the directory above your whales / water imagery
+###     The class_list argument is a list of the folders that you want to use in the cross-validation
+###     e.g.,   python split_train_test.py --root_dir ./Data/fulldata/train --n_folds 4 --out_dir ./Data/fulldata/cv --class_list Water Whales
+#######################################################################################################
+### Load libraries
 from shutil import copyfile
 import argparse
+import os
 import os.path
+import numpy as np
 from m_util import *
-opt = argparse.ArgumentParser().parse_args()
 
-
+parse = argparse.ArgumentParser()
+parse.add_argument('--root_dir',default='./Data/fulldata/train')
+parse.add_argument('--n_folds',default=4)
+parse.add_argument('--out_dir', default='./Data/fulldata/crossvalidation')
+parse.add_argument('--class_list', nargs='+',required=True)
+opt = parse.parse_args()
 #######################################################################################################
-
-####
-
-
-
+## load the spacewhale class
+s = spacewhale()
  
-### Generates an list of arrays. The values in the arrays represent index values for images. 
-### The number of 
-def gen_folds(NIM,n):
-    idx = np.random.permutation(NIM)
-    return [idx[i::n] for i in range(n)]
+#### Load the options from the arguments
+n_folds=opt.n_folds
+root_dir=opt.root_dir
+out_dir=opt.out_dir
+classlist=opt.class_list
 
 
+##### Loop through the files and run the create cross-validation data 
+for i in classlist:
+    print('-----------------------------------------------------------------------------')
+    print('create cross validation data for', i)
+    s.create_cv_data(root_dir,i,n_folds,out_dir)
 
-#### This function will split up the training data into separate folders which can be used for validation
-
-
-
-def train_splitter(root_dir, n_folds, class_n):
-    
-    opt.im_fold=os.path.join(root_dir,class_n)
-    opt.split=os.path.join(root_dir,'split',class_n)
-    opt.new_fold=os.path.join(root_dir,'fold_')
-
-    sdmkdir(opt.split)
-
-    imlist = []
-    test_ratio = 0.25
-
-    for root,_,fnames in sorted(os.walk(opt.im_fold)):
-        for fname in fnames:
-            if fname.lower().endswith('.png'):
-                imlist.append(fname)
-                
-    nim = len(imlist)
-    print("all: ",nim)
-    print(imlist)
-    list_to_file(opt.split+'/all.txt',imlist)
-    nim_test = int(float(nim)*test_ratio)
-    print(nim_test)
-
-    for split_idx in range(1):
-        test_list= []
-        train_list = []
-
-        folds = gen_folds(nim,n_folds)
-        print(folds)
-        for f in range(n_folds):
-            test_list = [imlist[i] for i in folds[f]] 
-            train_list = [i for i in imlist if  i not in test_list]
-            sdmkdir(opt.new_fold+str(f)+'/train/'+class_n)
-            sdmkdir(opt.new_fold+str(f)+'/val/'+class_n)
-            for file in train_list:
-                copyfile(opt.im_fold+'/'+file,opt.new_fold+str(f)+'/train/'+class_n+'/'+file)
-            for file in test_list:
-                copyfile(opt.im_fold+'/'+file,opt.new_fold+str(f)+'/val/'+class_n+'/'+file)
-            list_to_file(opt.split+"/val_"+str(f)+'.txt',test_list)
-            list_to_file(opt.split+"/train_"+str(f)+'.txt',train_list)
-
-
-
-## Set number of folds
-n_folds=4
-
-class_n='Whales'
-
-root_dir = '/home/ghumphries/Projects/whale/Data'
-
-train_splitter(root_dir,n_folds,'Whales')
-
-train_splitter(root_dir,n_folds,'Water')
-
-
-#class_n='Water'
+print('-----------------------------------------------------------------------------')
+print('COMPLETE')
 
 
 
 
 
-        
-    
+
+
+
