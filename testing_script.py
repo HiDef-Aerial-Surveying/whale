@@ -50,6 +50,7 @@ parse = argparse.ArgumentParser()
 parse.add_argument('--data_dir')
 parse.add_argument('--model')
 parse.add_argument('--epoch',type=int,default=24)
+parse.add_argument('--class_list', nargs='+',required=True) ## list of classes you want to view at the output
 opt = parse.parse_args()
 ##########################################################################
 ### Get data from command line arguments
